@@ -1,0 +1,50 @@
+version: "3.2"
+services:
+  nodejs:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    networks:
+      - frontend
+      - backend
+    environment:
+      - MYSQL_HOST=mysql-app
+      # - MYSQL_USER=root
+      - MYSQL_PASS=12345678
+      # - MYSQL_DB=db-app
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - "3000:3000"
+    container_name: nodejs-app
+
+  mysql:
+    image: mysql:5.7
+    networks:
+      - backend
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345678
+      # - MYSQL_USER=root
+      - MYSQL_PASSWORD=12345678
+      - MYSQL_DATABASE=db-app
+    container_name: mysql-app
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mysql
+    networks:
+      - backend
+    ports:
+      - "8090:80"
+    environment:
+      - PMA_HOST=mysql-app
+      - MYSQL_ROOT_PASSWORD:12345678
+      # - PMA_PORT= 3306
+    volumes:
+      - /sessions
+    container_name: phpmyadmin-app
+
+networks:
+  frontend:
+  backend:
